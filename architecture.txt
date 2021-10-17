@@ -1,0 +1,24 @@
+Core Features:
+Suche nach Namen
+Suche nach Developer
+Suche nach Publisher
+Genres Filter
+
+Features:
+Categories Filter
+Release Date Filter
+Platforms Filter
+
+Optionale Features:
+Description Anzeige
+Media Anzeige
+Preis Filter
+Review Filter
+
+Schnittstellen:
+REST Schnittstelle
+Befehle TODO
+
+Allgemeine Architekture:
+Datensatz Steam Games
+https://www.kaggle.com/nikdavis/steam-store-games
