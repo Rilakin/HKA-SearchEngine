@@ -1,0 +1,136 @@
+{
+  "description": "Ingest pipeline created by text structure finder",
+  "processors": [
+    {
+      "csv": {
+        "field": "message",
+        "target_fields": [
+          "appid",
+          "name",
+          "release_date",
+          "english",
+          "developer",
+          "publisher",
+          "platforms",
+          "required_age",
+          "categories",
+          "genres",
+          "steamspy_tags",
+          "achievements",
+          "positive_ratings",
+          "negative_ratings",
+          "average_playtime",
+          "median_playtime",
+          "owners",
+          "price"
+        ],
+        "ignore_missing": false
+      }
+    },
+    {
+      "date": {
+        "field": "release_date",
+        "timezone": "{{ event.timezone }}",
+        "formats": [
+          "ISO8601"
+        ]
+      }
+    },
+    {
+      "convert": {
+        "field": "achievements",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "appid",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "average_playtime",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "english",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "median_playtime",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "negative_ratings",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "positive_ratings",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "price",
+        "type": "double",
+        "ignore_missing": true
+      }
+    },
+    {
+      "convert": {
+        "field": "required_age",
+        "type": "long",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "message"
+      }
+    },
+    {
+      "split": {
+        "field": "genres",
+        "separator": ";",
+        "ignore_missing": true
+      } 
+    },
+    {
+      "split": {
+        "field": "categories",
+        "separator": ";",
+        "ignore_missing": true
+      } 
+    },
+    {
+      "split": {
+        "field": "steamspy_tags",
+        "separator": ";",
+        "ignore_missing": true
+      } 
+    },
+	{
+      "split": {
+        "field": "platforms",
+        "separator": ";",
+        "ignore_missing": true
+      } 
+    }
+  ]
+}

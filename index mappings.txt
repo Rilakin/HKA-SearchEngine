@@ -1,0 +1,62 @@
+{
+  "properties": {
+    "@timestamp": {
+      "type": "date"
+    },
+    "achievements": {
+      "type": "long"
+    },
+    "appid": {
+      "type": "long"
+    },
+    "average_playtime": {
+      "type": "long"
+    },
+    "categories": {
+      "type": "keyword"
+    },
+    "developer": {
+      "type": "text"
+    },
+    "english": {
+      "type": "boolean"
+    },
+    "genres": {
+      "type": "keyword"
+    },
+    "median_playtime": {
+      "type": "long"
+    },
+    "name": {
+      "type": "text"
+    },
+    "negative_ratings": {
+      "type": "long"
+    },
+    "owners": {
+      "type": "keyword"
+    },
+    "platforms": {
+      "type": "keyword"
+    },
+    "positive_ratings": {
+      "type": "long"
+    },
+    "price": {
+      "type": "double"
+    },
+    "publisher": {
+      "type": "text"
+    },
+    "release_date": {
+      "type": "date",
+      "format": "iso8601"
+    },
+    "required_age": {
+      "type": "long"
+    },
+    "steamspy_tags": {
+      "type": "text"
+    }
+  }
+}
