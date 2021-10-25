@@ -17,7 +17,24 @@ Review Filter
 
 Schnittstellen:
 REST Schnittstelle
-Befehle TODO
+
+Einfache Spielesuche ohne Filter:
+/games/<Name>
+
+Spielesuche mit genres Filter:
+/games/<Name>?<filter liste> (bsp: /games/Counter-Strike?Action,Free To Play)
+
+Developer Suche:
+/developer/<Name>
+
+Spielesuche mit genres Filter:
+/developer/<Name>?<filter liste> (bsp: /developer/Valve?Action)
+
+Publisher Suche:
+/publisher/<Name>
+
+Spielesuche mit genres Filter:
+/publisher/<Name>?<filter liste> (bsp: /publisher/EA?Action)
 
 Allgemeine Architekture:
 Datensatz Steam Games
