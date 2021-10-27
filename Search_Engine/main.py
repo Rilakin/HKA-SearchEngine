@@ -117,5 +117,6 @@ def list_genres():
 
 
 if __name__ == '__main__':
-    search_games("Counter-Strike", "Action")
+    #search_games("Counter-Strike", "Action")
     # get_genres()
+    app.run()
