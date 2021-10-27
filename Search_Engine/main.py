@@ -119,4 +119,4 @@ def list_genres():
 if __name__ == '__main__':
     #search_games("Counter-Strike", "Action")
     # get_genres()
-    app.run()
+    app.run(host="127.0.0.1", port="5001")
