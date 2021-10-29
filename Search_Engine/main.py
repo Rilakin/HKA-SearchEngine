@@ -121,9 +121,9 @@ def get_metadata():
     query.aggs.bucket('platforms', 'terms', field='platforms')
     response = query.execute()
 
-    # print(response.aggregations.genres.buckets)
-    # print(response.aggregations.categories.buckets)
-    # print(response.aggregations.platforms.buckets)
+    print(response.aggregations.genres.buckets)
+    print(response.aggregations.categories.buckets)
+    print(response.aggregations.platforms.buckets)
 
     return response
 
@@ -137,7 +137,10 @@ def list_games(game_name):
     categories_filter = request.args.get("categories")
     platforms_filter = request.args.get("platforms")
     paging = request.args.get("paging")
-    return jsonify(search_games(game_name, genres_filter, categories_filter, platforms_filter, paging))
+    result = search_games(game_name, genres_filter, categories_filter, platforms_filter, paging)
+    result = jsonify(result)
+    result.headers.add("Access-Control-Allow-Origin", "*")
+    return result
 
 
 @app.get("/publisher/<publisher_name>")
@@ -146,7 +149,10 @@ def list_publisher(publisher_name):
     categories_filter = request.args.get("categories")
     platforms_filter = request.args.get("platforms")
     paging = request.args.get("paging")
-    return jsonify(search_publishers(publisher_name, genres_filter, categories_filter, platforms_filter, paging))
+    result = search_publishers(publisher_name, genres_filter, categories_filter, platforms_filter, paging)
+    result = jsonify(result)
+    result.headers.add("Access-Control-Allow-Origin", "*")
+    return result
 
 
 @app.get("/developer/<developer_name>")
@@ -155,7 +161,9 @@ def list_developer(developer_name):
     categories_filter = request.args.get("categories")
     platforms_filter = request.args.get("platforms")
     paging = request.args.get("paging")
-    return jsonify(search_developers(developer_name, genres_filter, categories_filter, platforms_filter, paging))
+    result = jsonify(search_developers(developer_name, genres_filter, categories_filter, platforms_filter, paging))
+    result.headers.add("Access-Control-Allow-Origin", "*")
+    return result
 
 
 @app.get("/genres")
@@ -166,5 +174,5 @@ def list_genres():
 if __name__ == '__main__':
     # search_games("Counter-Strike", "Action")
     # search_developers("Valve", "")
-    # get_metadata()
+    #get_metadata()
     app.run(host="127.0.0.1", port="5001")
