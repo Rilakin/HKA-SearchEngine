@@ -42,12 +42,12 @@ def append_media(search_result):
 
 
 def search_games(name, genres, categories, platforms, paging):
-    #start building search query with name
+    # start building search query with name
     query = Search(index='issa1011_steam_games') \
         .using(client_elastic) \
         .query(Q("match", name={'query': name, 'fuzziness': 'AUTO'}))
 
-    #apply filters
+    # apply filters
     if genres:
         query = query.filter("terms", genres=genres.split(","))
     if categories:
@@ -55,7 +55,7 @@ def search_games(name, genres, categories, platforms, paging):
     if platforms:
         query = query.filter("terms", platforms=platforms.split(","))
 
-    #apply paging
+    # apply paging
     if paging:
         paging_list = paging.split(",")
         query = query[int(paging_list[0]):int(paging_list[1])]
@@ -86,7 +86,6 @@ def search_developers(name, genres, categories, platforms, paging):
         query = query[int(paging_list[0]):int(paging_list[1])]
     else:
         query = query[0:10]
-
 
     response = query.execute()
 
@@ -174,5 +173,5 @@ def list_genres():
 if __name__ == '__main__':
     # search_games("Counter-Strike", "Action")
     # search_developers("Valve", "")
-    #get_metadata()
+    # get_metadata()
     app.run(host="127.0.0.1", port="5001")
