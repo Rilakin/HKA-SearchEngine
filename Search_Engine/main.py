@@ -6,6 +6,7 @@
 from elasticsearch import Elasticsearch, client
 from elasticsearch_dsl import Search, connections, A, Q
 from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 client_elastic = Elasticsearch([{"host": "node-1.hska.io", "port": 9200},
@@ -56,7 +57,8 @@ def search_games(name, genres, categories, platforms, paging):
 
     #apply paging
     if paging:
-        query = query[int(paging[0]):int(paging[1])]
+        paging_list = paging.split(",")
+        query = query[int(paging_list[0]):int(paging_list[1])]
     else:
         query = query[0:10]
 
@@ -80,7 +82,8 @@ def search_developers(name, genres, categories, platforms, paging):
 
     # apply paging
     if paging:
-        query = query[int(paging[0]):int(paging[1])]
+        paging_list = paging.split(",")
+        query = query[int(paging_list[0]):int(paging_list[1])]
     else:
         query = query[0:10]
 
@@ -105,7 +108,8 @@ def search_publishers(name, genres, categories, platforms, paging):
 
     # apply paging
     if paging:
-        query = query[int(paging[0]):int(paging[1])]
+        paging_list = paging.split(",")
+        query = query[int(paging_list[0]):int(paging_list[1])]
     else:
         query = query[0:10]
 
@@ -121,15 +125,11 @@ def get_metadata():
     query.aggs.bucket('platforms', 'terms', field='platforms')
     response = query.execute()
 
-    print(response.aggregations.genres.buckets)
-    print(response.aggregations.categories.buckets)
-    print(response.aggregations.platforms.buckets)
-
     return response
 
 
 # parameter example:
-# "http://127.0.0.1:5001/games/Counter-Strike?genres=Action,Strategy&categories=Singleplayer&platforms=Windows&paging=10,20"
+# "http://127.0.0.1:5001/games/Counter-Strike?genres=Action,Strategy&categories=Single-Player&platforms=Windows&paging=0,10"
 # note that "" is important for windows curl only
 @app.get("/games/<game_name>")
 def list_games(game_name):
