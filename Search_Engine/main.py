@@ -22,8 +22,14 @@ def search_media(game_id):
         .using(client_elastic) \
         .query("match", steam_appid=game_id)
     response = query.execute()
-    # print(response.to_dict())
-    # result = response.to_dict()
+    return response
+
+
+def search_description(game_id):
+    query = Search(index='issa1011_steam_games_description') \
+        .using(client_elastic) \
+        .query("match", steam_appid=game_id)
+    response = query.execute()
     return response
 
 
@@ -32,11 +38,12 @@ def append_media(search_result):
     for hit in search_result:
         hit_dict = hit.to_dict()
         game_media = search_media(hit.appid)
+        game_description = search_description(hit.appid)
         for media_hit in game_media:
             hit_dict["header_image"] = media_hit.header_image
-        # hit_dict["header_image"] = game_media["hits"]["_source"]["header_image"]
-        # print("Found the game: " + hit.name)
-        # print(hit_dict)
+        for des_hit in game_description:
+            hit_dict["short_description"] = des_hit.short_description
+            hit_dict["detailed_description"] = des_hit.detailed_description
         result_list.append(hit_dict)
     return result_list
 
