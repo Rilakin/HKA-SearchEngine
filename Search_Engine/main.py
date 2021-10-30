@@ -48,6 +48,7 @@ def append_media(search_result):
 
 
 def add_filter(query, genres, categories, platforms, paging, price_min, price_max):
+    sorting = False
     # apply filters
     if genres:
         genres_list = genres.split(",")
@@ -64,7 +65,7 @@ def add_filter(query, genres, categories, platforms, paging, price_min, price_ma
     if price_min:
         query = query.filter("range", **{"price": {"gte": price_min}})
     if price_max:
-        query = query.filter("range", **{"price": { "lte": price_max}})
+        query = query.filter("range", **{"price": {"lte": price_max}})
 
     # apply paging
     if paging:
@@ -72,6 +73,10 @@ def add_filter(query, genres, categories, platforms, paging, price_min, price_ma
         query = query[int(paging_list[0]):int(paging_list[1])]
     else:
         query = query[0:10]
+
+    # apply sorting
+    if sorting:
+        query = query.sort({"price": {"order": "desc"}})
     return query
 
 
@@ -103,13 +108,24 @@ def search_publishers(name, genres, categories, platforms, paging, price_min, pr
     return append_media(response)
 
 
-def get_metadata():
+def get_genres():
     query = Search(index='issa1011_steam_games').using(client_elastic)
     query.aggs.bucket('genres', 'terms', field='genres')
+    response = query.execute()
+    return response
+
+
+def get_categories():
+    query = Search(index='issa1011_steam_games').using(client_elastic)
     query.aggs.bucket('categories', 'terms', field='categories')
+    response = query.execute()
+    return response
+
+
+def get_platforms():
+    query = Search(index='issa1011_steam_games').using(client_elastic)
     query.aggs.bucket('platforms', 'terms', field='platforms')
     response = query.execute()
-
     return response
 
 
@@ -138,7 +154,8 @@ def list_publisher(publisher_name):
     paging = request.args.get("paging")
     price_min = request.args.get("pricemin")
     price_max = request.args.get("pricemax")
-    result = search_publishers(publisher_name, genres_filter, categories_filter, platforms_filter, paging, price_min, price_max)
+    result = search_publishers(publisher_name, genres_filter, categories_filter, platforms_filter, paging, price_min,
+                               price_max)
     result = jsonify(result)
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
@@ -152,14 +169,30 @@ def list_developer(developer_name):
     paging = request.args.get("paging")
     price_min = request.args.get("pricemin")
     price_max = request.args.get("pricemax")
-    result = jsonify(search_developers(developer_name, genres_filter, categories_filter, platforms_filter, paging, price_min, price_max))
+    result = jsonify(
+        search_developers(developer_name, genres_filter, categories_filter, platforms_filter, paging, price_min,
+                          price_max))
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
 
 
-@app.get("/genres")
+@app.get("/filter/genres")
 def list_genres():
-    result = jsonify(get_metadata().to_dict())
+    result = jsonify(get_genres().to_dict())
+    result.headers.add("Access-Control-Allow-Origin", "*")
+    return result
+
+
+@app.get("/filter/categories")
+def list_categories():
+    result = jsonify(get_categories().to_dict())
+    result.headers.add("Access-Control-Allow-Origin", "*")
+    return result
+
+
+@app.get("/filter/platforms")
+def list_platforms():
+    result = jsonify(get_platforms().to_dict())
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
 
