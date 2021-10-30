@@ -111,7 +111,7 @@ def search_publishers(name, genres, categories, platforms, paging, price_min, pr
 def get_genres():
     result_list = []
     query = Search(index='issa1011_steam_games').using(client_elastic)
-    query.aggs.bucket('genres', 'terms', field='genres')
+    query.aggs.bucket('genres', 'terms', field='genres', size=1000)
     response = query.execute()
     for hit in response.aggregations.genres.buckets:
         hit_dict = hit.to_dict()
@@ -122,7 +122,7 @@ def get_genres():
 def get_categories():
     result_list = []
     query = Search(index='issa1011_steam_games').using(client_elastic)
-    query.aggs.bucket('categories', 'terms', field='categories')
+    query.aggs.bucket('categories', 'terms', field='categories', size=1000)
     response = query.execute()
     for hit in response.aggregations.categories.buckets:
         hit_dict = hit.to_dict()
@@ -133,11 +133,12 @@ def get_categories():
 def get_platforms():
     result_list = []
     query = Search(index='issa1011_steam_games').using(client_elastic)
-    query.aggs.bucket('platforms', 'terms', field='platforms')
+    query.aggs.bucket('platforms', 'terms', field='platforms', size=1000)
     response = query.execute()
     for hit in response.aggregations.platforms.buckets:
         hit_dict = hit.to_dict()
-        result_list.append(hit_dict)
+        if hit_dict["key"] != ',Windows':
+            result_list.append(hit_dict)
     return result_list
 
 
