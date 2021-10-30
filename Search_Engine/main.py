@@ -6,7 +6,6 @@
 from elasticsearch import Elasticsearch, client
 from elasticsearch_dsl import Search, connections, A, Q
 from flask import Flask, request, jsonify
-from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 client_elastic = Elasticsearch([{"host": "node-1.hska.io", "port": 9200},
@@ -48,7 +47,7 @@ def append_media(search_result):
     return result_list
 
 
-def add_filter(query, genres, categories, platforms, paging):
+def add_filter(query, genres, categories, platforms, paging, price_min, price_max):
     # apply filters
     if genres:
         genres_list = genres.split(",")
@@ -62,6 +61,10 @@ def add_filter(query, genres, categories, platforms, paging):
         platforms_list = platforms.split(",")
         for platform in platforms_list:
             query = query.filter("match", platforms=platform)
+    if price_min:
+        query = query.filter("range", **{"price": {"gte": price_min}})
+    if price_max:
+        query = query.filter("range", **{"price": { "lte": price_max}})
 
     # apply paging
     if paging:
@@ -72,30 +75,30 @@ def add_filter(query, genres, categories, platforms, paging):
     return query
 
 
-def search_games(name, genres, categories, platforms, paging):
+def search_games(name, genres, categories, platforms, paging, price_min, price_max):
     # start building search query with name
     query = Search(index='issa1011_steam_games') \
         .using(client_elastic) \
         .query(Q("match", name={'query': name, 'fuzziness': 'AUTO'}))
-    query = add_filter(query, genres, categories, platforms, paging)
+    query = add_filter(query, genres, categories, platforms, paging, price_min, price_max)
     response = query.execute()
     return append_media(response)
 
 
-def search_developers(name, genres, categories, platforms, paging):
+def search_developers(name, genres, categories, platforms, paging, price_min, price_max):
     query = Search(index='issa1011_steam_games') \
         .using(client_elastic) \
         .query(Q("match", developer={'query': name, 'fuzziness': 'AUTO'}))
-    query = add_filter(query, genres, categories, platforms, paging)
+    query = add_filter(query, genres, categories, platforms, paging, price_min, price_max)
     response = query.execute()
     return append_media(response)
 
 
-def search_publishers(name, genres, categories, platforms, paging):
+def search_publishers(name, genres, categories, platforms, paging, price_min, price_max):
     query = Search(index='issa1011_steam_games') \
         .using(client_elastic) \
         .query(Q("match", publisher={'query': name, 'fuzziness': 'AUTO'}))
-    query = add_filter(query, genres, categories, platforms, paging)
+    query = add_filter(query, genres, categories, platforms, paging, price_min, price_max)
     response = query.execute()
     return append_media(response)
 
@@ -119,7 +122,9 @@ def list_games(game_name):
     categories_filter = request.args.get("categories")
     platforms_filter = request.args.get("platforms")
     paging = request.args.get("paging")
-    result = search_games(game_name, genres_filter, categories_filter, platforms_filter, paging)
+    price_min = request.args.get("pricemin")
+    price_max = request.args.get("pricemax")
+    result = search_games(game_name, genres_filter, categories_filter, platforms_filter, paging, price_min, price_max)
     result = jsonify(result)
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
@@ -131,7 +136,9 @@ def list_publisher(publisher_name):
     categories_filter = request.args.get("categories")
     platforms_filter = request.args.get("platforms")
     paging = request.args.get("paging")
-    result = search_publishers(publisher_name, genres_filter, categories_filter, platforms_filter, paging)
+    price_min = request.args.get("pricemin")
+    price_max = request.args.get("pricemax")
+    result = search_publishers(publisher_name, genres_filter, categories_filter, platforms_filter, paging, price_min, price_max)
     result = jsonify(result)
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
@@ -143,7 +150,9 @@ def list_developer(developer_name):
     categories_filter = request.args.get("categories")
     platforms_filter = request.args.get("platforms")
     paging = request.args.get("paging")
-    result = jsonify(search_developers(developer_name, genres_filter, categories_filter, platforms_filter, paging))
+    price_min = request.args.get("pricemin")
+    price_max = request.args.get("pricemax")
+    result = jsonify(search_developers(developer_name, genres_filter, categories_filter, platforms_filter, paging, price_min, price_max))
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
 
@@ -159,4 +168,4 @@ if __name__ == '__main__':
     # search_games("Counter-Strike", "Action")
     # search_developers("Valve", "")
     # get_metadata()
-    app.run(host="0.0.0.0", port="5000")
+    app.run(host="127.0.0.1", port="5000")
