@@ -150,7 +150,9 @@ def list_developer(developer_name):
 
 @app.get("/genres")
 def list_genres():
-    return jsonify(get_metadata().to_dict())
+    result = jsonify(get_metadata().to_dict())
+    result.headers.add("Access-Control-Allow-Origin", "*")
+    return result
 
 
 if __name__ == '__main__':
