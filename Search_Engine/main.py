@@ -48,19 +48,20 @@ def append_media(search_result):
     return result_list
 
 
-def search_games(name, genres, categories, platforms, paging):
-    # start building search query with name
-    query = Search(index='issa1011_steam_games') \
-        .using(client_elastic) \
-        .query(Q("match", name={'query': name, 'fuzziness': 'AUTO'}))
-
+def add_filter(query, genres, categories, platforms, paging):
     # apply filters
     if genres:
-        query = query.filter("terms", genres=genres.split(","))
+        genres_list = genres.split(",")
+        for genre in genres_list:
+            query = query.filter("match", genres=genre)
     if categories:
-        query = query.filter("terms", categories=categories.split(","))
+        categories_list = categories.split(",")
+        for category in categories_list:
+            query = query.filter("match", categories=category)
     if platforms:
-        query = query.filter("terms", platforms=platforms.split(","))
+        platforms_list = platforms.split(",")
+        for platform in platforms_list:
+            query = query.filter("match", platforms=platform)
 
     # apply paging
     if paging:
@@ -68,9 +69,16 @@ def search_games(name, genres, categories, platforms, paging):
         query = query[int(paging_list[0]):int(paging_list[1])]
     else:
         query = query[0:10]
+    return query
 
+
+def search_games(name, genres, categories, platforms, paging):
+    # start building search query with name
+    query = Search(index='issa1011_steam_games') \
+        .using(client_elastic) \
+        .query(Q("match", name={'query': name, 'fuzziness': 'AUTO'}))
+    query = add_filter(query, genres, categories, platforms, paging)
     response = query.execute()
-
     return append_media(response)
 
 
@@ -78,24 +86,8 @@ def search_developers(name, genres, categories, platforms, paging):
     query = Search(index='issa1011_steam_games') \
         .using(client_elastic) \
         .query(Q("match", developer={'query': name, 'fuzziness': 'AUTO'}))
-
-    # apply filters
-    if genres:
-        query = query.filter("terms", genres=genres.split(","))
-    if categories:
-        query = query.filter("terms", categories=categories.split(","))
-    if platforms:
-        query = query.filter("terms", platforms=platforms.split(","))
-
-    # apply paging
-    if paging:
-        paging_list = paging.split(",")
-        query = query[int(paging_list[0]):int(paging_list[1])]
-    else:
-        query = query[0:10]
-
+    query = add_filter(query, genres, categories, platforms, paging)
     response = query.execute()
-
     return append_media(response)
 
 
@@ -103,24 +95,8 @@ def search_publishers(name, genres, categories, platforms, paging):
     query = Search(index='issa1011_steam_games') \
         .using(client_elastic) \
         .query(Q("match", publisher={'query': name, 'fuzziness': 'AUTO'}))
-
-    # apply filters
-    if genres:
-        query = query.filter("terms", genres=genres.split(","))
-    if categories:
-        query = query.filter("terms", categories=categories.split(","))
-    if platforms:
-        query = query.filter("terms", platforms=platforms.split(","))
-
-    # apply paging
-    if paging:
-        paging_list = paging.split(",")
-        query = query[int(paging_list[0]):int(paging_list[1])]
-    else:
-        query = query[0:10]
-
+    query = add_filter(query, genres, categories, platforms, paging)
     response = query.execute()
-
     return append_media(response)
 
 
@@ -135,7 +111,7 @@ def get_metadata():
 
 
 # parameter example:
-# "http://127.0.0.1:5001/games/Counter-Strike?genres=Action,Strategy&categories=Single-Player&platforms=Windows&paging=0,10"
+# "http://127.0.0.1:5001/games/Counter-Strike?genres=Action&categories=Multi-player&platforms=windows&paging=0,10"
 # note that "" is important for windows curl only
 @app.get("/games/<game_name>")
 def list_games(game_name):
@@ -181,4 +157,4 @@ if __name__ == '__main__':
     # search_games("Counter-Strike", "Action")
     # search_developers("Valve", "")
     # get_metadata()
-    app.run(host="127.0.0.1", port="5001")
+    app.run(host="0.0.0.0", port="5000")
