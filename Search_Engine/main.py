@@ -109,24 +109,36 @@ def search_publishers(name, genres, categories, platforms, paging, price_min, pr
 
 
 def get_genres():
+    result_list = []
     query = Search(index='issa1011_steam_games').using(client_elastic)
     query.aggs.bucket('genres', 'terms', field='genres')
     response = query.execute()
-    return response
+    for hit in response.aggregations.genres.buckets:
+        hit_dict = hit.to_dict()
+        result_list.append(hit_dict)
+    return result_list
 
 
 def get_categories():
+    result_list = []
     query = Search(index='issa1011_steam_games').using(client_elastic)
     query.aggs.bucket('categories', 'terms', field='categories')
     response = query.execute()
-    return response
+    for hit in response.aggregations.categories.buckets:
+        hit_dict = hit.to_dict()
+        result_list.append(hit_dict)
+    return result_list
 
 
 def get_platforms():
+    result_list = []
     query = Search(index='issa1011_steam_games').using(client_elastic)
     query.aggs.bucket('platforms', 'terms', field='platforms')
     response = query.execute()
-    return response
+    for hit in response.aggregations.platforms.buckets:
+        hit_dict = hit.to_dict()
+        result_list.append(hit_dict)
+    return result_list
 
 
 # parameter example:
@@ -178,21 +190,21 @@ def list_developer(developer_name):
 
 @app.get("/filter/genres")
 def list_genres():
-    result = jsonify(get_genres().to_dict())
+    result = jsonify(get_genres())
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
 
 
 @app.get("/filter/categories")
 def list_categories():
-    result = jsonify(get_categories().to_dict())
+    result = jsonify(get_categories())
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
 
 
 @app.get("/filter/platforms")
 def list_platforms():
-    result = jsonify(get_platforms().to_dict())
+    result = jsonify(get_platforms())
     result.headers.add("Access-Control-Allow-Origin", "*")
     return result
 
