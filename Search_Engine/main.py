@@ -6,6 +6,7 @@
 from elasticsearch import Elasticsearch, client
 from elasticsearch_dsl import Search, connections, A, Q
 from flask import Flask, request, jsonify
+import ast
 
 app = Flask(__name__)
 client_elastic = Elasticsearch([{"host": "node-1.hska.io", "port": 9200},
@@ -40,7 +41,10 @@ def append_media(search_result):
         game_description = search_description(hit.appid)
         for media_hit in game_media:
             hit_dict["header_image"] = media_hit.header_image
-            hit_dict["videos"] = media_hit.movies
+            if "movies" in media_hit:
+                movie_list = ast.literal_eval(media_hit.movies[0])
+                movie_dict = movie_list[0]
+                hit_dict["movies"] = movie_dict["webm"]["max"]
         for des_hit in game_description:
             hit_dict["short_description"] = des_hit.short_description
             hit_dict["detailed_description"] = des_hit.detailed_description
@@ -138,13 +142,13 @@ def get_platforms():
     response = query.execute()
     for hit in response.aggregations.platforms.buckets:
         hit_dict = hit.to_dict()
-        if hit_dict["key"] != ',Windows':
+        if hit_dict["key"] != ',windows':
             result_list.append(hit_dict)
     return result_list
 
 
 # parameter example:
-# "http://127.0.0.1:5001/games/Counter-Strike?genres=Action&categories=Multi-player&platforms=windows&paging=0,10"
+# "http://127.0.0.1:5000/games/Counter-Strike?genres=Action&categories=Multi-player&platforms=windows&paging=0,10"
 # note that "" is important for windows curl only
 @app.get("/games/<game_name>")
 def list_games(game_name):
