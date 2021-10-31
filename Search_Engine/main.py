@@ -40,6 +40,7 @@ def append_media(search_result):
         game_description = search_description(hit.appid)
         for media_hit in game_media:
             hit_dict["header_image"] = media_hit.header_image
+            hit_dict["videos"] = media_hit.movies
         for des_hit in game_description:
             hit_dict["short_description"] = des_hit.short_description
             hit_dict["detailed_description"] = des_hit.detailed_description
