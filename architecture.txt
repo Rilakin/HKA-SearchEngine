@@ -36,6 +36,15 @@ Publisher Suche:
 Spielesuche mit genres Filter:
 /publisher/<Name>?<filter liste> (bsp: /publisher/EA?Action)
 
-Allgemeine Architekture:
+Genres Filter:
+/filter/genres
+
+Categories Filter:
+/filter/genres/categories
+
+Platforms Filter:
+/filter/genres/platforms
+
+Allgemeine Architektur:
 Datensatz Steam Games
 https://www.kaggle.com/nikdavis/steam-store-games
